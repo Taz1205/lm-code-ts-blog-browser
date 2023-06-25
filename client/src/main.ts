@@ -1,9 +1,11 @@
 import { exit } from "./exit/exit";
 import { showMenu } from "./menu/menu";
+import { addUser } from "./menu/options/add_user/add_user";
 import { browsePosts } from "./menu/options/browse_posts/browse_posts";
 import { sendMessage } from "./menu/options/send_message/send_message";
 import { showAllPosts } from "./menu/options/show_all_posts/show_all_posts";
 import { showAllUsers } from "./menu/options/show_all_users/show_all_users";
+import { addUserToServer } from "./api/add_user_to_server";
 import { State } from "./states/state";
 import { states } from "./states/states";
 import { clear, print, printNewLine, prompt } from "./ui/console";
@@ -16,12 +18,9 @@ async function begin() {
 }
 
 const stateHandlers = {
-	"MENU": async function() {
-	  return await showMenu();
-	},
-	"SEND_MESSAGE": async function() {
-	  return await sendMessage();
-	},
+	"MENU": showMenu,
+	"SEND_MESSAGE": sendMessage,
+	
 	"SHOW_POSTS": async function() {
 	  clear("");
 	  await showAllPosts();
@@ -38,11 +37,18 @@ const stateHandlers = {
 	  return states.MENU;
 	},
 	"ADD_USER": async function() {
-	  clear("");
-	  print("🏗️  This functionality has not been implemented!");
-	  await prompt("⌨️ Press [ENTER] to return to the main menu! 🕶️");
-	  return states.MENU;
-	},
+		clear("");
+		const user = await addUser();
+		const response = await addUserToServer(user);
+		console.log(response);
+		if (response) {
+		  print("User added successfully!");
+		} else {
+		  print("Something went wrong when adding the user. Please try again.");
+		}
+		await prompt("Press [ENTER] to return to the main menu!");
+		return states.MENU;
+	  },
 	"UNKNOWN": async function() {
 	  clear("");
 	  print("😵 We have entered an unknown state.");

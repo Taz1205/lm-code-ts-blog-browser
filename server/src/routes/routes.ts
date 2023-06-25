@@ -1,8 +1,9 @@
 import * as express from "express";
 import { Express } from "express";
 import { getAllPosts } from "../services/posts_service";
-import { getAllUsers } from "../services/users_service";
-
+import { getAllUsers, addUser } from "../services/users_service";
+import { User } from "../types/posts.types";
+//import { addUser } from "../../../client/src/menu/options/add_user/add_user";
 /*
 
 	This file hooks up routes such as `/` or `/users` with methods that can handle their response
@@ -83,15 +84,30 @@ function addAPIRoutes(app: Express) {
 	});
 
 	// ❗ [1] See README
+	console.log("👤  Adding 'Add Users' endpoint...");
+	apiRouter.post("/users/add", async (req, res) => {
+		try {
+			const { body } = req;
+			const newUser = addUser(body);
 
-	apiRouter.get("/users/:id", (req, res) => {
+			res.status(200).send({ success: true}); 
+			console.log(`👤 New user added: ${JSON.stringify(newUser)}`);
+
+		} catch (error) {
+			console.error(`Error when adding user: ${error}`);
+			res.status(500).send({ success: false, error: 'Server error' });
+		}
+	});
+
+	/*apiRouter.get("/users/:id", (req, res) => {
 		res
 			.status(200)
 			.send(
 				JSON.stringify(getAllUsers().filter((u) => u.id === req.params.id))
 			);
-	});
+	});*/
 
+	
 	console.log("🛠️  Applying API router to Express server...");
 	app.use("/api", apiRouter);
 }
