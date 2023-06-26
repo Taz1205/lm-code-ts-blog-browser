@@ -40,7 +40,6 @@ const stateHandlers = {
 		clear("");
 		const user = await addUser();
 		const response = await addUserToServer(user);
-		console.log(response);
 		if (response) {
 		  print("User added successfully!");
 		} else {
